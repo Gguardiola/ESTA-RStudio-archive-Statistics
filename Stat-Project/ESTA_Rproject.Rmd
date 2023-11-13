@@ -1,0 +1,295 @@
+---
+title: "ACTIVITAT A3-2 ESTADÍSTICA"
+author: "Gabriel Guardiola (individual)"
+date: "29/12/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+<u>
+  <p style="font-size:20px;">
+    <strong>Estadística descriptiva</strong>
+  </p>
+</u>
+
+### Ejercicio 1
+
+Importa el archivo "plantilla.csv"
+Haz la FA (frecuencia absoluta) y la FR (frecuencia relativa) de las variables "Edad" y "Sueldo"
+
+<strong>Información adicional sobre el csv:</strong><br>
+Es la plantilla de una empresa donde consta el nombre, edad, sueldo (en euros), y años de antiguedad. El sueldo no tiene porqué ser directamente propocional a su antiguedad, ya que cada uno ocupa diferentes puestos y responsabilidades.
+
+```{r}
+plantilla = read.csv("plantilla.csv", sep=";");
+plantilla
+
+```
+FA de "Edad":
+```{r}
+edadT = table(plantilla$Edad);#FA
+edadT
+```
+FR de "Edad":
+```{r}
+edadP = prop.table(edadT);##FR
+edadP
+```
+FA de "Sueldo":
+```{r}
+sueldoT = table(plantilla$Sueldo);#FA
+sueldoT
+```
+FR de "Sueldo":
+```{r}
+sueldoP = prop.table(sueldoT);#FR
+sueldoP
+```
+Muestra el Nombre de las personas menores de 20 años
+```{r}
+menores = plantilla$Nombre[plantilla$Edad<20]
+menores
+```
+Añade al DataFrame una variable nueva de tipo Factor que se llame "Categoria" y que recodifique "antiguedad" según el siguiente codigo:<br>
+<br>
+Freshman (si tiene 1 año de antiguedad)<br>
+Sophomore (si tiene 2 años de antiguedad)<br>
+Junior (si tiene 3 años de antiguedad)<br>
+Senior (si tiene 4 años o MÁS de antiguedad)<br>
+<br>
+```{r}
+plantilla$Categoria[plantilla$Antiguedad==1] = "Freshman"
+plantilla$Categoria[plantilla$Antiguedad==2] = "Sophomore"
+plantilla$Categoria[plantilla$Antiguedad==3] = "Junior"
+plantilla$Categoria[plantilla$Antiguedad>=4] = "Senior"
+
+plantilla
+```
+
+Representa en un gráfico de barras la variable Categoria.
+```{r}
+barplot(table(plantilla$Categoria),col=rainbow(4),xlab="Categorias",main="Cantidad de categorias")
+```
+<br>
+<strong>OBSERVACIÓN: </strong>podemos ver que la gran mayoria de trabajadores son "Freshman"
+<br>
+<br>
+Representa un gráfico circular para la variable Edad
+```{r}
+pie(table(plantilla$Edad),col=rainbow(20), main = "Gráfico circular para la variable Edad")
+```
+<br>
+<strong>OBSERVACIÓN: </strong>podemos observar que la mayoria de personas tienen 21 y 27 años.
+<br><br>
+Representa en un histograma, la variable Sueldos
+```{r}
+hist(table(plantilla$Sueldo), col = "cyan", main = "Histograma de sueldos", xlab="Sueldos")
+```
+<br>
+<strong>OBSERVACIÓN: </strong>en este histograma podemos destacar que gran parte de los trabajadores cobran entre 1000 y 1.500 euros, que corresponde al sueldo de los que son "Freshman".
+<br><br>
+Representa en un gráfico de Caja y bigotes, la variable Sueldo
+
+```{r}
+boxplot(plantilla$Sueldo,xlab="Sueldo",main="Caja y bigotes de Sueldo") 
+```
+<br>
+<strong>OBSERVACIÓN: </strong>en este gráfico de caja y bigotes podemos observar que la media se encuentra en torno los 1.600 euros y que en conjunto de toda la plantilla de trabajadores, la mayoria cobran por encima de los 1600.
+<br><br>
+Haz el cálculo de la mediana y media de las variables Edad y Sueldo.
+
+```{r}
+mean(plantilla$Edad)
+```
+```{r}
+median(plantilla$Edad)
+```
+```{r}
+mean(plantilla$Sueldo)
+```
+```{r}
+median(plantilla$Sueldo)
+```
+Muestra el summary de Sueldo.
+```{r}
+summary(plantilla$Sueldo)
+```
+Muestra los quantils de la variable Sueldo.
+```{r}
+quantile(plantilla$Sueldo)
+```
+Muestra la desviación estandar, el rango intercuartilico y la variancia de la variable Sueldo.
+```{r}
+variancia = var(plantilla$Sueldo)
+variancia
+```
+```{r}
+desviacio = sd(plantilla$Sueldo)
+desviacio
+```
+```{r}
+rangI = IQR(plantilla$Sueldo)
+rangI
+```
+Muestra el porcentaje de la variable Antiguedad y redondea a 2 decimales.
+```{r}
+total = round(prop.table(table(plantilla$Antiguedad))*100,digits=2)
+total
+```
+Muestra las edades ordenadas.
+```{r}
+sort(plantilla$Edad)
+```
+<hr>
+
+<u>
+  <p style="font-size:20px;">
+    <strong>Inferencia estadística</strong>
+  </p>
+</u>
+
+### Ejercicio 2
+
+De una tienda de coches de segunda mano, queremos encontrar el intérvalo de confianza para un nivel del 95%. La tienda consta de una muestra de 150 coches, con un valor medio de 1200. Se conoce por su historial de coches vendidos que la desviación típica es de 10.
+
+```{r}
+alfa = 0.05
+qn = qnorm(1-alfa/2)
+n = 150
+var = 10^2
+med = 1200
+inter1 = med-qn*(var)/sqrt(n)
+inter2 = med+qn*(var)/sqrt(n)
+sprintf("[%s , %s]",inter1,inter2)
+
+```
+En conclusión, el intérvalo de confianza para un nivel del 95% es <strong>[1183.99696107882 , 1216.00303892118]</strong>
+
+### Ejercicio 3
+Según una muestra de 25 personas donde se mide la cantidad de minutos que han tardado en ser atendidos para hacerse un test PCR, determina la media y el intérvalo de confianza al nivel 98%
+```{r}
+muestra = read.csv("ej3.csv", sep=";");
+muestra
+```
+Media de minutos en ser atendidos:
+```{r}
+medi = mean(muestra$Minutos.en.espera)
+medi
+```
+IC al 98%:
+```{r}
+alfa = 0.02
+desvi = sd(muestra$Minutos.en.espera)
+qt = qt((1-alfa/2),24,lower.tail = T)
+
+inter1 = medi-qt*(desvi)/sqrt(length(muestra$Minutos.en.espera))
+inter2 = medi+qt*(desvi)/sqrt(length(muestra$Minutos.en.espera))
+sprintf("[%s , %s]",inter1,inter2)
+
+```
+En conclusión, en el intérvalo <strong>[5.6730354167592 , 10.8069645832408]</strong> hay un 98% de confianza.<br>
+<br>
+<br>
+Gráfico circular de los minutos de espera:
+```{r}
+pie(table(muestra$Minutos.en.espera),col=rainbow(25), main = "Gráfico circular de minutos en espera")
+```
+<br>
+<strong>OBSERVACIÓN: </strong>podemos observar que la mayoria de personas han esperado 5 minutos.
+<br><br>
+
+
+<br>
+Otra forma más sencilla y directa de hacerlo:
+```{r}
+t.test(muestra$Minutos.en.espera,conf.level = 0.98)
+```
+### Problema 4 - ANOVA
+En una empresa de paquetería hay 5 básculas y para optimizar el ritmo de trabajo se necesita que las 5 básculas hayan pesado una cantidad similar entre ellas al acabar el día. Por la bascula 1 han pasado 52 paquetes, por la bascula 2, 31, por la bascula 3, 45, por la bascula 4, 52, y por la bascula 5, 27.
+<br>
+Omite los valores vacios "NA" y guarda cada columna en una variable.
+```{r}
+datos = read.csv("pesos.csv",stringsAsFactors = T)
+b1 = na.omit(datos$Bascula1)
+b2 = na.omit(datos$Bascula2)
+b3 = na.omit(datos$Bascula3)
+b4 = na.omit(datos$Bascula4)
+b5 = na.omit(datos$Bascula5)
+```
+Genera un gráfico de caja y bigotes para analizar previamente cada báscula.
+```{r}
+boxplot(b1,b2,b3,b4,b5,ylab="peso(kg)",col=rainbow(5),names=c("Bascula 1","Bascula 2","Bascula 3","Bascula 4","Bascula 5"))
+```
+<br>
+<strong>OBSERVACIÓN: </strong>podemos destacar que: la Bascula 3 es la que más objetos pesados a registrado, mientras que la Bascula 1 ha sido la que más objetos ligeros ha registrado. La media de todas las básculas oscila entre 4500kg y 5700kg (aproximadamente).
+<br><br>
+Calcula los grados de libertat y las medianas.
+```{r}
+m = 5
+n1 = length(b1)
+n2 = length(b2)
+n3 = length(b3)
+n4 = length(b4)
+n5 = length(b5)
+n = n1+n2+n3+n4+n5
+n
+```
+Medianas:
+```{r}
+mb1 = mean(b1)
+mb2 = mean(b2)
+mb3 = mean(b3)
+mb4 = mean(b4)
+mb5 = mean(b5)
+totalm=1/n*(sum(b1)+sum(b2)+sum(b3)+sum(b4)+sum(b5))
+sprintf("Mediana total: %s",(totalm))
+```
+Calcula la suma de cuadrados.
+```{r}
+VT = sum((b1-totalm)^2)+sum((b2-totalm)^2)+sum((b3-totalm)^2)+sum((b4-totalm)^2)+sum((b5-totalm)^2)
+VR = sum((b1-mb1)^2)+sum((b2-mb2)^2)+sum((b3-mb3)^2)+sum((b4-mb4)^2)+sum((b5-mb5)^2)
+VE = n1*(mb1-totalm)^2+n2*(mb2-totalm)^2+n3*(mb3-totalm)^2+n4*(mb4-totalm)^2+n5*(mb5-totalm)^2
+```
+Calcula las variancias.
+```{r}
+sT2 = VT/(n-1)
+sR2 = VR/(n-m)
+sE2 = VE/(m-1)
+```
+Calcula l'estadistic mostral.
+```{r}
+z = sE2/sR2
+```
+
+Tabla ANOVA:
+```{r}
+anovaDF = data.frame(
+  SS = c(VE,VR,VT),
+  DF = c((m-1),(n-m),(n-1)),
+  S2 = c(sE2,sR2,sT2),
+  Z = c(NA,NA,z)
+)
+anovaDF
+```
+
+Calcula la RR con un nivel de confianza del 95%.
+```{r}
+alfa = 0.05
+Za = qf(1-alfa,m-1,n-m)
+RR = sprintf("RR = (%s, +inf)",Za)
+print(RR)
+```
+
+<strong>Cómo Z < RR, se acepta la hipotesis.</strong>
+
+
+
+
+
+
+
+
+
